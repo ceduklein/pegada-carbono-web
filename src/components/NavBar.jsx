@@ -1,29 +1,59 @@
+import { Navbar, Nav, NavDropdown } from "react-bootstrap"
+import { FiUserPlus } from "react-icons/fi"
+import { CgUserList } from "react-icons/cg"
+import { FaCar } from "react-icons/fa"
+import { VscListFlat } from "react-icons/vsc"
+import { BiTrip } from "react-icons/bi"
+
 export function NavBar() {
   return(
     <div className="navbar navbar-expand-lg fixed-top navbar-light bg-light">
       <div className="container">
-        <a href="" className="navbar-brand">Pegada de Carbono</a>
-        <button className="navbar-toggler" 
-          type="button" 
-          data-bs-toggle="collapse" 
-          data-bs-target="#navbarColor03" 
-          aria-controls="navbarColor03" 
-          aria-expanded="false" 
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        <Navbar.Brand href="/">Pegada de Carbono</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="navbar-bg-light-example">
+            <Nav className="me-auto">
+              <NavDropdown
+                id="basic-nav-dropdown"
+                title="Colaboradores"
+                menuVariant="light"
+              >
+                <NavDropdown.Item href="/colaboradores/cadastro">
+                  <FiUserPlus style={{marginBottom: '5px'}} /> Novo
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/colaboradores">
+                  <CgUserList size={18} style={{marginBottom: '5px'}} /> Listar
+                </NavDropdown.Item>
+              </NavDropdown>
 
-        <div className="collapse navbar-collapse" id="navbarColor01">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <a className="nav-link" href="/colaboradores">Colaboradores</a>
-            </li>
-          </ul>
-        </div>
+              <NavDropdown
+                id="basic-nav-dropdown"
+                title="Veículos"
+                menuVariant="light"
+              >
+                <NavDropdown.Item href="/">
+                  <FaCar style={{marginBottom: '5px'}} /> Novo
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/">
+                  <VscListFlat style={{marginBottom: '2px'}} /> Listar
+                </NavDropdown.Item>
+              </NavDropdown>
 
+              <NavDropdown
+                id="basic-nav-dropdown"
+                title="Chamados"
+                menuVariant="light"
+              >
+                <NavDropdown.Item href="/">
+                  <BiTrip style={{marginBottom: '5px'}} /> Novo
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/">
+                  <VscListFlat style={{marginBottom: '2px'}} /> Listar
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          </Navbar.Collapse>
       </div>
-
     </div>
   )
 }

@@ -1,23 +1,45 @@
 import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { Card } from "../components/Card";
 import { CheckBox } from "../components/CheckBox";
 import { FormGroup } from "../components/FormGroup";
-import { Link } from "react-router-dom";
+import { alertError, alertSuccess } from "../components/toastr";
+
+import { ColaboradorService } from "../services/ColaboradorService";
 
 export function CadastroColaborador() {
+  const navigate = useNavigate();
+  
   const [id, setId] = useState();
   const [nome, setNome] = useState('');
   const [habilitado, setHabilitado] = useState();
 
+  const service = new ColaboradorService();
+
   const save = async () => {
-    console.log(id)
-    console.log(nome)
-    console.log(habilitado)
+    const colaborador = {
+      nome,
+      habilitado
+    }
+    
+    try {
+      service.validate(colaborador);
+    } catch (error) {
+      const errors = error.msgs;
+      errors.forEach(e => alertError(e));
+      return false;
+    }
+
+    await service.save(colaborador).then(response =>{
+      alertSuccess("Colaborador cadastrado.")
+      navigate("/colaboradores");
+    }).catch(error => alertError(error.response.data.message));
   }
 
-  function verifyCheckBox(checked) {
+  const verifyCheckBox = (checked) => {
     setHabilitado(checked)
-  }
+  };
 
   return (
     <Card title="Cadastrar Colaborador">
