@@ -14,7 +14,9 @@ export function AppRoutes() {
       <Routes>
         <Route path="" element={<Home />} />
         <Route path="/colaboradores" element={<Colaborador />} />
-        <Route path='/colaboradores/cadastro' element={<CadastroColaborador />} />
+        <Route path='/colaboradores/cadastro' element={<CadastroColaborador />}>
+          <Route path=":id" element={<CadastroColaborador />} />
+        </Route>
         <Route path="/veiculos" element={<Veiculo />} />
       </Routes>
     </Router>

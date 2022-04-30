@@ -12,6 +12,15 @@ export class ColaboradorService {
     return api.put(`${url}/${colaborador.id}`, colaborador);
   }
 
+  delete(id) {
+    console.log(id);
+    return api.delete(`${url}/${id}`);
+  }
+
+  getById(id) {
+    return api.get(`${url}/${id}`);
+  }
+
   validate(colaborador) {
     const errors = []
 

@@ -1,21 +1,39 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Card } from "../components/Card";
-import { CheckBox } from "../components/CheckBox";
 import { FormGroup } from "../components/FormGroup";
 import { alertError, alertSuccess } from "../components/toastr";
 
 import { ColaboradorService } from "../services/ColaboradorService";
 
 export function CadastroColaborador() {
-  const navigate = useNavigate();
-  
-  const [id, setId] = useState();
-  const [nome, setNome] = useState('');
-  const [habilitado, setHabilitado] = useState();
-
   const service = new ColaboradorService();
+  const navigate = useNavigate();
+  let params = useParams();
+  
+  const [id, setId] = useState('');
+  const [nome, setNome] = useState('');
+  const [habilitado, setHabilitado] = useState(false);
+
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if (params.id) {
+      getColaboradorById(params.id);
+    }
+  } ,[]);
+
+  const getColaboradorById = async (id) => {
+    await service.getById(id).then(response => {
+      setId(response.data.id);
+      setNome(response.data.nome);
+      setHabilitado(response.data.habilitado);
+      setUpdating(true);
+    }).catch(error => {
+      return alertError("Colaborador não encontrado.");
+    });
+  }
 
   const save = async () => {
     const colaborador = {
@@ -42,7 +60,7 @@ export function CadastroColaborador() {
   };
 
   return (
-    <Card title="Cadastrar Colaborador">
+    <Card title={updating ? "Atualizar Cadastro Colaborador" : "Cadastrar Colaborador"}>
       <div className="row">
         <div className="col-md-10">
           <FormGroup htmlFor="inputNome" label="Nome: ">
@@ -56,7 +74,7 @@ export function CadastroColaborador() {
           <FormGroup htmlFor="inputId" label="Id: ">
             <input type="text" id="inputId" 
               className="form-control" disabled
-              value={id}
+              value={id || ""}
               />
           </FormGroup>
         </div>
@@ -65,9 +83,12 @@ export function CadastroColaborador() {
       <div className="row">
         <div className="col-md-12">
           <FormGroup label="">
-            <CheckBox label="Habilitado"
-              click={verifyCheckBox}>
-          </CheckBox>
+            <div className="form-check">
+              <input className="form-check-input" 
+                type="checkbox" 
+                onChange={e => verifyCheckBox(e.target.checked)} checked={habilitado} />
+              <label className="form-check-label" >Habilitado</label>
+            </div>
           </FormGroup>
         </div>
       </div>
@@ -77,11 +98,10 @@ export function CadastroColaborador() {
           <div style={{marginLeft: "auto"}}>
             <button type="button" 
               className="btn btn-primary"
-              onClick={save}>Salvar
+              onClick={save}> {updating ? "Atualizar" : "Salvar"}
             </button>
 
-            <Link className="btn btn-danger" to="/colaboradores">Cancelar</Link>
-              
+            <Link className="btn btn-danger" to="/colaboradores">Cancelar</Link>   
           </div>  
         </div>
       </div>
