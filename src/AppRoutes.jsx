@@ -3,7 +3,9 @@ import {
   Routes,
   Route,
 } from 'react-router-dom';
+
 import { CadastroColaborador } from './pages/CadastroColaborador';
+import { CadastroVeiculo } from './pages/CadastroVeiculo';
 import { Colaborador } from './pages/Colaborador';
 import { Home } from './pages/Home';
 import { Veiculo } from './pages/Veiculo';
@@ -18,6 +20,9 @@ export function AppRoutes() {
           <Route path=":id" element={<CadastroColaborador />} />
         </Route>
         <Route path="/veiculos" element={<Veiculo />} />
+        <Route path="/veiculos/cadastro" element={<CadastroVeiculo />}>
+          <Route path=":id" element={<CadastroVeiculo />} />
+        </Route>
       </Routes>
     </Router>
   )

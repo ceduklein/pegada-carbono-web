@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
 import { FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
-import api from "../api/api";
 import { Card } from "../components/Card";
 import { TableColaborador } from "../components/TableColaborador";
 import { ColaboradorService } from "../services/colaboradorService";
 import { alertSuccess, alertError } from '../components/toastr';
-import { useNavigate } from "react-router-dom";
+
 
 export function Colaborador() {
   const service = new ColaboradorService();
@@ -20,21 +20,30 @@ export function Colaborador() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
-    getColaboradores();
+    getColaboradoresData();
   } ,[]);
 
-  const getColaboradores = async () => {
-    const response = await api.get("/colaboradores");
-    setColaboradores(response.data);
+  const getColaboradoresData = async () => {
+    await service.getColaboradores().then(response => setColaboradores(response.data))
+      .catch(error => alertError("Erro ao carregar lista de colaboradores."));
   }
 
   const deleteColaborador = async () => {
     await service.delete(colaborador.id).then(response =>{
       alertSuccess("Colaborador excluído.")
       closeDeleteDialog();
-      getColaboradores();
+      getColaboradoresData();
     }).catch (error => alertError("Erro ao excluir o colaborador."));
   }
+
+  const editColaborador = (id) => navigate(`/colaboradores/cadastro/${id}`);
+
+  const openDeleteDialog = (colaborador)  => {
+    setColaborador(colaborador);
+    setShowDeleteDialog(true);
+  }
+  
+  const closeDeleteDialog = () => setShowDeleteDialog(false);
 
   const deleteDialogFooter = () => {
     return (
@@ -48,17 +57,6 @@ export function Colaborador() {
       </div>
     );
   }
-
-  const editColaborador = (id) => {
-    navigate(`/colaboradores/cadastro/${id}`);
-  }
-
-  const openDeleteDialog = (colaborador)  => {
-    setColaborador(colaborador);
-    setShowDeleteDialog(true);
-  }
-  
-  const closeDeleteDialog = () => setShowDeleteDialog(false);
 
   return (
     <div className="jumbotron" style={{padding: '10px', marginTop: '-30px'}}>

@@ -13,8 +13,11 @@ export class ColaboradorService {
   }
 
   delete(id) {
-    console.log(id);
     return api.delete(`${url}/${id}`);
+  }
+
+  getColaboradores() {
+    return api.get(`${url}`);
   }
 
   getById(id) {
@@ -22,10 +25,10 @@ export class ColaboradorService {
   }
 
   validate(colaborador) {
-    const errors = []
+    const errors = [];
 
     if(!colaborador.nome || colaborador.nome.length < 3)
-      errors.push("Informe um nome válido")
+      errors.push("Informe um nome válido");
     
     if(errors && errors.length > 0)
       throw new ErroValidcao(errors);

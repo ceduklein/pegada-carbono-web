@@ -31,10 +31,10 @@ export function NavBar() {
                 title="Veículos"
                 menuVariant="light"
               >
-                <NavDropdown.Item href="/">
+                <NavDropdown.Item href="/veiculos/cadastro">
                   <FaCar style={{marginBottom: '5px'}} /> Novo
                 </NavDropdown.Item>
-                <NavDropdown.Item href="/">
+                <NavDropdown.Item href="/veiculos">
                   <VscListFlat style={{marginBottom: '2px'}} /> Listar
                 </NavDropdown.Item>
               </NavDropdown>

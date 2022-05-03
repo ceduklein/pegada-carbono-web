@@ -1,36 +1,17 @@
-import { useState } from "react";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { FilterMatchMode } from 'primereact/api';
-import { FiEdit, FiTrash2 } from "react-icons/fi"
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode } from 'primereact/api';
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { useState } from 'react';
 
-export function TableColaborador(props) {
-  const formatBoolean = (rowData) => rowData.habilitado ? "Sim" : "Não";
+export function TableVeiculo(props) {
+  const formatBoolean = (rowData) => rowData.disponivel ? "Disponível" : "Indisponível";
 
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [filters, setFilters] = useState({
     'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
-
-  const actionButtons = (rowData) => {
-    return (
-      <>
-        <button type='button'
-          title="Editar"
-          onClick={e => props.onClickEdit(rowData.id)} 
-          className="btn btn-primary btn-action">
-          <FiEdit size={16}/>
-        </button>
-        <button type='button'
-          title="Excluir"
-          onClick={e => props.onClickDelete(rowData)} 
-          className="btn btn-danger btn-action">
-          <FiTrash2 size={16}/>
-        </button>
-      </>
-    )
-  }
 
   const renderHeader = () => {
     return (
@@ -52,15 +33,34 @@ export function TableColaborador(props) {
     setFilters(_filters);
     setGlobalFilterValue(value);
   }
-  
+
+  const actionButtons = (rowData) => {
+    return (
+      <>
+        <button type='button'
+          title="Editar"
+          onClick={e => props.onClickEdit(rowData.id)} 
+          className="btn btn-primary btn-action">
+          <FiEdit size={16}/>
+        </button>
+        <button type='button'
+          title="Excluir"
+          onClick={e => props.onClickDelete(rowData)} 
+          className="btn btn-danger btn-action">
+          <FiTrash2 size={16}/>
+        </button>
+      </>
+    )
+  }
+
   const header = renderHeader();
 
   return(
-    <DataTable value={props.data} header={header} dataKey="id" 
+    <DataTable value={props.data} header={header} dataKey="id"
       removableSort
       resizableColumns
       filterDisplay="row" filters={filters}
-      globalFilterFields={['id', 'nome', 'habilitado']}
+      globalFilterFields={['id', 'modelo', 'placa', 'kmLitro', 'disponivel']}
       columnResizeMode="fit"
       paginator
       paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -69,9 +69,13 @@ export function TableColaborador(props) {
       className="p-datatable-sm p-datatable-striped">
 
         <Column field="id" header="Id" sortable />
-        <Column field="nome" header="Nome" sortable />
-        <Column field="habilitado" body={formatBoolean} header="Habilitado" sortable />
+        <Column field="modelo" header="Modelo" sortable />
+        <Column field="placa" header="Placa" sortable />
+        <Column field="kmLitro" header="Consumo (km/litro)" sortable />
+        <Column field="disponivel" body={formatBoolean} header="Situação" sortable />
         <Column body={actionButtons} header="Ação" />
+
       </DataTable>
   )
 }
+                 

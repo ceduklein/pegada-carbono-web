@@ -4,7 +4,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/Card";
 import { FormGroup } from "../components/FormGroup";
 import { alertError, alertSuccess } from "../components/toastr";
-
 import { ColaboradorService } from "../services/ColaboradorService";
 
 export function CadastroColaborador() {
@@ -36,10 +35,7 @@ export function CadastroColaborador() {
   }
 
   const save = async () => {
-    const colaborador = {
-      nome,
-      habilitado
-    }
+    const colaborador = { nome, habilitado }
     
     try {
       service.validate(colaborador);
@@ -50,9 +46,26 @@ export function CadastroColaborador() {
     }
 
     await service.save(colaborador).then(response =>{
-      alertSuccess("Colaborador cadastrado.")
+      alertSuccess("Colaborador cadastrado.");
       navigate("/colaboradores");
-    }).catch(error => alertError(error.response.data.message));
+    }).catch(error => alertError("Erro ao cadastrar colaborador."));
+  }
+
+  const update = async () => {
+    const colaborador = { id, nome, habilitado}
+
+    try {
+      service.validate(colaborador);
+    } catch (error) {
+      const errors = error.msgs;
+      errors.forEach(e => alertError(e));
+      return false;
+    }
+
+    await service.update(colaborador).then(response =>{
+      alertSuccess("Cadastro atualizado.");
+      navigate("/colaboradores");
+    }).catch(error => alertError("Erro ao atulizar cadastro do colaborador."));
   }
 
   const verifyCheckBox = (checked) => {
@@ -98,7 +111,7 @@ export function CadastroColaborador() {
           <div style={{marginLeft: "auto"}}>
             <button type="button" 
               className="btn btn-primary"
-              onClick={save}> {updating ? "Atualizar" : "Salvar"}
+              onClick={updating ? update : save}> {updating ? "Atualizar" : "Salvar"}
             </button>
 
             <Link className="btn btn-danger" to="/colaboradores">Cancelar</Link>   
