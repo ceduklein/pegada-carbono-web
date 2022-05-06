@@ -45,7 +45,7 @@ export function CadastroVeiculo() {
       kmLitro: Number(kmLitro.toString().replace(',', '.')), 
       disponivel 
     };
-
+    
     try {
       service.validate(veiculo);
     } catch (error) {
@@ -67,7 +67,6 @@ export function CadastroVeiculo() {
       kmLitro: Number(kmLitro.toString().replace(',', '.')), 
       disponivel 
     };
-    console.log(veiculo);
 
     try {
       service.validate(veiculo);

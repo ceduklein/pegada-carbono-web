@@ -44,10 +44,10 @@ export function NavBar() {
                 title="Chamados"
                 menuVariant="light"
               >
-                <NavDropdown.Item href="/">
+                <NavDropdown.Item href="/chamados/registro">
                   <BiTrip style={{marginBottom: '5px'}} /> Novo
                 </NavDropdown.Item>
-                <NavDropdown.Item href="/">
+                <NavDropdown.Item href="/chamados">
                   <VscListFlat style={{marginBottom: '2px'}} /> Listar
                 </NavDropdown.Item>
               </NavDropdown>
