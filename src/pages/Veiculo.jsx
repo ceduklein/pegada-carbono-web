@@ -1,25 +1,23 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
-import { Dialog } from "primereact/dialog";
-import { FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 import { alertError, alertSuccess } from "../components/toastr";
 import { VeiculoService } from "../services/VeiculoService";
 import { Card } from "../components/Card";
 import { TableVeiculo } from "../components/TableVeiculo";
+import { Modal } from "../components/Modal";
 
 export function Veiculo() {
   const navigate = useNavigate();
-
   const service = new VeiculoService();
 
   const [veiculos, setVeiculos] = useState([]);
   const [veiculo, setVeiculo] = useState({});
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [msg, setMsg] = useState(undefined);
 
   useEffect(() => {
     getVeiculosData();
-    console.log(veiculos);
   } ,[]);
 
   const getVeiculosData = async () => {
@@ -27,35 +25,23 @@ export function Veiculo() {
       .catch(error => alertError("Erro ao carregar lista de veículos."));
   }
 
-  const deleteVeiculo = async () => {
+  const onConfirmDelete = async () => {
     await service.delete(veiculo.id).then(response => {
       alertSuccess("Veículo excluído.")
-      closeDeleteDialog();
       getVeiculosData();
-    })
+      setShowDialog(false);
+    }).catch(error => alertError("Erro ao excluir o veículo."))
   }
 
-  const editVeiculo = (id) => navigate(`/veiculos/cadastro/${id}`);
+  const handleEdit = (id) => navigate(`/veiculos/cadastro/${id}`);
 
-  const openDeleteDialog = (veiculo)  => {
+  const handleDelete = (veiculo)  => {
     setVeiculo(veiculo)
-    setShowDeleteDialog(true);
+    setMsg(`Deseja excluir o veículo ${veiculo.modelo} - Placa: ${veiculo.placa}?`)
+    setShowDialog(true);
   }
  
-  const closeDeleteDialog = () => setShowDeleteDialog(false);
-
-  const deleteDialogFooter = () => {
-    return (
-      <div>
-        <button type="button" className="btn btn-primary" onClick={deleteVeiculo}>
-          <FiCheckCircle style={{marginRight: '2px', marginBottom: '2px'}} /> Sim
-        </button>
-        <button type="button" className="btn btn-danger" onClick={closeDeleteDialog}>
-          <FiXCircle size={19} style={{marginBottom: '2px'}} /> Não
-        </button>
-      </div>
-    );
-  }
+  const handleCloseDialog = () => setShowDialog(false);
 
   return (
     <div className="jumbotron" style={{padding: '10px', marginTop: '-30px'}}>
@@ -65,8 +51,8 @@ export function Veiculo() {
           <div className="col-md-12">
             <div className="bs-component">
               <TableVeiculo data={veiculos}
-                onClickDelete={openDeleteDialog}
-                onClickEdit={editVeiculo}
+                onClickDelete={handleDelete}
+                onClickEdit={handleEdit}
               />
             </div>
           </div>
@@ -74,17 +60,11 @@ export function Veiculo() {
 
         {/* Dialog Confirmação de Exclusão */}
         <div>
-          <Dialog header={<span>
-                            <FiAlertCircle size={30} color={'red'} style={{marginRight: 20}} />
-                            Confirmação!
-                          </span>}
-                  visible={showDeleteDialog} 
-                  style={{ width: '40vw' }}
-                  footer={deleteDialogFooter}
-                  modal={true} 
-                  onHide={closeDeleteDialog}>
-                    {`Deseja excluir o veículo ${veiculo ? `${veiculo.modelo} - Placa: ${veiculo.placa}`: ""}?`}
-          </Dialog>
+          <Modal msg={msg}
+              closeDialog={handleCloseDialog} 
+              showDialog={showDialog}
+              onConfirm={onConfirmDelete}
+          />
         </div>
       </Card>
     </div>

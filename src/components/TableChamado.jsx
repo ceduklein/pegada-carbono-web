@@ -6,9 +6,21 @@ import { FilterMatchMode } from 'primereact/api';
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaFlagCheckered } from "react-icons/fa";
 
+import { formatBr } from "../utils/formatDate";
+
 
 export function TableChamado(props) {
-  // const formatBoolean = (rowData) => rowData.disponivel ? "Disponível" : "Indisponível";
+  const { data, onClickDelete, onClickEdit, onClickFinish } = props;
+  
+  const formatBoolean = (rowData) => rowData.concluido ? "Concluído" : "Em andamento";
+
+  const formatData = (rowData) => {
+    return formatBr(rowData.dataInicio);
+  }
+
+  const roundNumber = (rowData) => {
+    return rowData.pegadaCarbono.toFixed(2)
+  }
 
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [filters, setFilters] = useState({
@@ -39,21 +51,34 @@ export function TableChamado(props) {
   const actionButtons = (rowData) => {
     return (
       <>
-        <button type='button'
-          title="Encerrar"
-          onClick={e => props.onClickFinish(rowData)} 
-          className="btn btn-secondary btn-action">
-          <FaFlagCheckered size={16}/>
-        </button>
+        {rowData.concluido ?
+          (
+            <button type='button'
+              title="Encerrar" disabled
+              onClick={e => onClickFinish(rowData)} 
+              className="btn btn-secondary btn-action">
+              <FaFlagCheckered size={16}/>
+            </button>
+          ) :
+          (
+            <button type='button'
+              title="Encerrar" 
+              onClick={e => onClickFinish(rowData)} 
+              className="btn btn-secondary btn-action">
+              <FaFlagCheckered size={16}/>
+            </button>
+          )
+        } 
+         
         <button type='button'
           title="Editar"
-          onClick={e => props.onClickEdit(rowData.id)} 
+          onClick={e => onClickEdit(rowData.id)} 
           className="btn btn-primary btn-action">
           <FiEdit size={16}/>
         </button>
         <button type='button'
           title="Excluir"
-          onClick={e => props.onClickDelete(rowData)} 
+          onClick={e => onClickDelete(rowData)} 
           className="btn btn-danger btn-action">
           <FiTrash2 size={16}/>
         </button>
@@ -64,11 +89,11 @@ export function TableChamado(props) {
   const header = renderHeader();
 
   return(
-    <DataTable value={props.data} header={header} dataKey="id"
+    <DataTable value={data} header={header} dataKey="id"
       removableSort
       resizableColumns
       filterDisplay="row" filters={filters}
-      globalFilterFields={['id', 'dataInicio', 'endereco', 'distancia', 'pegadaCarbono']}
+      globalFilterFields={['id', 'dataInicio', 'colaborador.nome', 'veiculo.modelo', 'endereco', 'distancia', 'pegadaCarbono']}
       columnResizeMode="fit"
       paginator
       paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -76,12 +101,14 @@ export function TableChamado(props) {
       rows={10} rowsPerPageOptions={[10,20,30,40,50]}
       className="p-datatable-sm p-datatable-striped">
 
-        <Column field="id" header="Id" sortable />
-        <Column field="dataInicio" header="Data" sortable />
-        <Column field="endereco" header="Endereço" sortable />
-        <Column field="distancia" header="Distancia" sortable />
-        <Column field="pegadaCarbono" header="CO²" sortable />
-        
+        {/* <Column field="id" header="Id" sortable /> */}
+        <Column field="dataInicio" body={formatData} header="Data" sortable />
+        <Column field="colaborador.nome" header="Colaborador" sortable />
+        <Column field="veiculo.modelo" header="Veículo" sortable />
+        <Column field="endereco" header="Endereço" style={{maxWidth: '25rem'}} sortable />
+        <Column field="distancia" header="Dist(Km)" sortable />
+        <Column field="pegadaCarbono" body={roundNumber} header="CO²" sortable />
+        <Column field="concluido" body={formatBoolean} header="Situação" sortable />
         <Column body={actionButtons} header="Ação" />
 
       </DataTable>

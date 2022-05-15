@@ -17,14 +17,14 @@ export class ChamadoService {
   }
 
   finish(id) {
-    return api.put(`${url}/encerrar/${chamado.id}`);
+    return api.put(`${url}/encerrar/${id}`);
   }
 
   getChamados() {
     return api.get(`${url}`);
   }
 
-  getById() {
+  getById(id) {
     return api.get(`${url}/${id}`);
   }
 
@@ -43,6 +43,19 @@ export class ChamadoService {
     if (!chamado.distancia || chamado.distancia < 1 )
       errors.push("Distância inválida");
     
+    if(errors && errors.length > 0)
+      throw new ErroValidcao(errors);
+  }
+
+  validateUpdate(chamado) {
+    const errors = [];
+
+    if (!chamado.endereco || chamado.endereco.length < 3)
+      errors.push("Endereço inválido");
+  
+    if (!chamado.distancia || chamado.distancia < 1 )
+      errors.push("Distância inválida");
+  
     if(errors && errors.length > 0)
       throw new ErroValidcao(errors);
   }

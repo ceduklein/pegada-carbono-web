@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
-import { FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 import { Card } from "../components/Card";
 import { TableColaborador } from "../components/TableColaborador";
 import { ColaboradorService } from "../services/colaboradorService";
 import { alertSuccess, alertError } from '../components/toastr';
+import { Modal } from "../components/Modal";
 
 
 export function Colaborador() {
@@ -17,7 +16,8 @@ export function Colaborador() {
   const [colaboradores, setColaboradores] = useState([]);
   const [colaborador, setColaborador] = useState({});
 
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [msg, setMsg] = useState(undefined);
 
   useEffect(() => {
     getColaboradoresData();
@@ -28,35 +28,23 @@ export function Colaborador() {
       .catch(error => alertError("Erro ao carregar lista de colaboradores."));
   }
 
-  const deleteColaborador = async () => {
+  const onConfirmDelete = async () => {
     await service.delete(colaborador.id).then(response =>{
       alertSuccess("Colaborador excluído.")
-      closeDeleteDialog();
+      handleCloseDialog();
       getColaboradoresData();
     }).catch (error => alertError("Erro ao excluir o colaborador."));
   }
 
-  const editColaborador = (id) => navigate(`/colaboradores/cadastro/${id}`);
+  const handleEdit = (id) => navigate(`/colaboradores/cadastro/${id}`);
 
-  const openDeleteDialog = (colaborador)  => {
+  const handleDelete = (colaborador)  => {
     setColaborador(colaborador);
-    setShowDeleteDialog(true);
-  }
+    setMsg(`Deseja excluir o cadastro do colaborador ${colaborador.nome}?`)
+    setShowDialog(true);
+  };
   
-  const closeDeleteDialog = () => setShowDeleteDialog(false);
-
-  const deleteDialogFooter = () => {
-    return (
-      <div>
-        <button type="button" className="btn btn-primary" onClick={deleteColaborador}>
-          <FiCheckCircle style={{marginRight: '2px', marginBottom: '2px'}} /> Sim
-        </button>
-        <button type="button" className="btn btn-danger" onClick={closeDeleteDialog}>
-          <FiXCircle size={19} style={{marginBottom: '2px'}} /> Não
-        </button>
-      </div>
-    );
-  }
+  const handleCloseDialog = () => setShowDialog(false);
 
   return (
     <div className="jumbotron" style={{padding: '10px', marginTop: '-30px'}}>
@@ -66,26 +54,19 @@ export function Colaborador() {
           <div className="col-md-12">
             <div className="bs-component">
               <TableColaborador data={colaboradores}
-                onClickDelete={openDeleteDialog}
-                onClickEdit={editColaborador}
+                onClickDelete={handleDelete}
+                onClickEdit={handleEdit}
               />
             </div>
           </div>
         </div>
-
         {/* Dialog Confirmação de Exclusão */}
         <div>
-          <Dialog header={<span>
-                            <FiAlertCircle size={30} color={'red'} style={{marginRight: 20}} />
-                            Confirmação!
-                          </span>}
-                  visible={showDeleteDialog} 
-                  style={{ width: '40vw' }}
-                  footer={deleteDialogFooter}
-                  modal={true} 
-                  onHide={closeDeleteDialog}>
-                    {`Deseja excluir o colaborador ${colaborador ? `${colaborador.nome}`: ""}?`}
-          </Dialog>
+          <Modal msg={msg}
+              closeDialog={handleCloseDialog} 
+              showDialog={showDialog}
+              onConfirm={onConfirmDelete}
+          />
         </div>
       </Card>
     </div>

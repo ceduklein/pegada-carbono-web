@@ -30,7 +30,7 @@ export class VeiculoService {
     if(!veiculo.modelo || veiculo.modelo.length < 2)
       errors.push("Modelo inválido");
 
-    if(!veiculo.placa || veiculo.placa.length < 7)
+    if(!veiculo.placa || veiculo.placa.length < 7 || veiculo.placa.length > 7)
       errors.push("Placa inválida");
     
     if(!veiculo.kmLitro || veiculo.kmLitro < 1 || veiculo.kmLitro > 50)

@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/Card";
 import { FormGroup } from "../components/FormGroup";
 import { alertError, alertSuccess } from "../components/toastr";
+import { Modal } from "../components/Modal";
 import { ColaboradorService } from "../services/ColaboradorService";
 
 export function CadastroColaborador() {
@@ -16,27 +17,27 @@ export function CadastroColaborador() {
   const [habilitado, setHabilitado] = useState(false);
 
   const [updating, setUpdating] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+
+  const { id : idColaborador } = params;
 
   useEffect(() => {
-    if (params.id) {
-      getColaboradorById(params.id);
+    if (idColaborador) {
+      getColaboradorById(idColaborador);
     }
   } ,[]);
 
   const getColaboradorById = async (id) => {
     await service.getById(id).then(response => {
+      setUpdating(true);
       setId(response.data.id);
       setNome(response.data.nome);
       setHabilitado(response.data.habilitado);
-      setUpdating(true);
-    }).catch(error => {
-      return alertError("Colaborador não encontrado.");
-    });
+    }).catch(error => alertError("Colaborador não encontrado."));
   }
 
-  const save = async () => {
-    const colaborador = { nome, habilitado }
-    
+  const handleSave = async () => {
+    const colaborador = { nome, habilitado };
     try {
       service.validate(colaborador);
     } catch (error) {
@@ -51,9 +52,8 @@ export function CadastroColaborador() {
     }).catch(error => alertError("Erro ao cadastrar colaborador."));
   }
 
-  const update = async () => {
-    const colaborador = { id, nome, habilitado}
-
+  const handleUpdate = async () => {
+    const colaborador = { id, nome, habilitado };
     try {
       service.validate(colaborador);
     } catch (error) {
@@ -68,9 +68,21 @@ export function CadastroColaborador() {
     }).catch(error => alertError("Erro ao atulizar cadastro do colaborador."));
   }
 
+  const onConfirmDelete = async () => {
+    await service.delete(id).then(response => {
+      alertSuccess("Colaborador excluído.");
+      navigate("/colaboradores");
+      handleCloseDialog();
+    }).catch(error => alertError("Erro ao excluir colaborador."))
+  }
+
   const verifyCheckBox = (checked) => {
     setHabilitado(checked)
   };
+
+  const handleDelete = () => setShowDialog(true);
+
+  const handleCloseDialog = () => setShowDialog(false);
 
   return (
     <Card title={updating ? "Atualizar Cadastro Colaborador" : "Cadastrar Colaborador"}>
@@ -111,12 +123,30 @@ export function CadastroColaborador() {
           <div style={{marginLeft: "auto"}}>
             <button type="button" 
               className="btn btn-primary"
-              onClick={updating ? update : save}> {updating ? "Atualizar" : "Salvar"}
+              onClick={updating ? handleUpdate : handleSave}> {updating ? "Atualizar" : "Salvar"}
             </button>
-
+            {updating ?
+              (
+                <button type="button" 
+                  className="btn btn-secondary"
+                  onClick={handleDelete}> Excluir
+                </button>
+              ) :
+              (
+                <></>
+              )
+            }
             <Link className="btn btn-danger" to="/colaboradores">Cancelar</Link>   
           </div>  
         </div>
+      </div>
+      {/* Dialog Confirmação */}
+      <div>
+        <Modal msg="Deseja excluir este colaborador?"
+            closeDialog={handleCloseDialog} 
+            showDialog={showDialog}
+            onConfirm={onConfirmDelete}
+        />
       </div>
     </Card>
   )

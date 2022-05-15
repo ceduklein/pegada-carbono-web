@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/Card";
 import { FormGroup } from "../components/FormGroup";
 import { alertError, alertSuccess } from "../components/toastr";
-import { VeiculoService } from "../services/VeiculoService"
+import { Modal } from "../components/Modal";
+import { VeiculoService } from "../services/VeiculoService";
 
 export function CadastroVeiculo() {
   const service = new VeiculoService();
@@ -12,6 +13,7 @@ export function CadastroVeiculo() {
   let params = useParams();
 
   const [updating, setUpdating] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   const [id, setId] = useState();
   const [modelo, setModelo] = useState('');
@@ -19,26 +21,28 @@ export function CadastroVeiculo() {
   const [kmLitro, setKmLitro] = useState('');
   const [disponivel, setDisponivel] = useState(true);
 
+  const { id: idVeiculo } = params;
+
   useEffect(() => {
-    if (params.id) {
-      getVeiculoById(params.id);
+    if (idVeiculo) {
+      getVeiculoById(idVeiculo);
     }
   } ,[]);
 
   const getVeiculoById = async (id) => {
     await service.getById(id).then(response => {
+      setUpdating(true);
       setId(response.data.id);
       setModelo(response.data.modelo);
       setPlaca(response.data.placa);
       setKmLitro(response.data.kmLitro);
       setDisponivel(response.data.disponivel);
-      setUpdating(true);
     }).catch(error => {
       return alertError("Veículo não encontrado.");
     });
   }
 
-  const save = async () => {
+  const handleSave = async () => {
     const veiculo = { 
       modelo,
       placa, 
@@ -59,7 +63,7 @@ export function CadastroVeiculo() {
     }).catch(error => alertError("Erro ao cadastrar veículo."))
   }
 
-  const update = async () => {
+  const handleUpdate = async () => {
     const veiculo = { 
       id,
       modelo,
@@ -80,6 +84,18 @@ export function CadastroVeiculo() {
       navigate("/veiculos");
     }).catch(error => alertError("Erro ao atualizar cadastro do veículo."));
   }
+
+  const onConfirmDelete = async () => {
+    await service.delete(id).then(response => {
+      alertSuccess("Veículo excluído.");
+      navigate("/veiculos");
+      handleCloseDialog();
+    }).catch(error => alertError("Erro ao excluir veículo."));
+  }
+
+  const handleDelete = () => setShowDialog(true);
+
+  const handleCloseDialog = () => setShowDialog(false);
 
   const verifyCheckBox = (checked) => {
     setDisponivel(checked)
@@ -140,12 +156,32 @@ export function CadastroVeiculo() {
           <div style={{marginLeft: "auto"}}>
             <button type="button" 
               className="btn btn-primary"
-              onClick={updating ? update : save}> {updating ? "Atualizar" : "Salvar"}
+              onClick={updating ? handleUpdate : handleSave}> {updating ? "Atualizar" : "Salvar"}
             </button>
 
-            <Link className="btn btn-danger" to="/colaboradores">Cancelar</Link>   
+            {updating ?
+              (
+                <button type="button" 
+                  className="btn btn-secondary"
+                  onClick={handleDelete}> Excluir
+                </button>
+              ) :
+              (
+                <></>
+              )
+            }
+
+            <Link className="btn btn-danger" to="/veiculos">Cancelar</Link>   
           </div>  
         </div>
+      </div>
+      {/* Dialog Confirmação */}
+      <div>
+        <Modal msg={`Deseja excluir este veículo?`}
+            closeDialog={handleCloseDialog} 
+            showDialog={showDialog}
+            onConfirm={onConfirmDelete}
+        />
       </div>
     </Card>
   )
